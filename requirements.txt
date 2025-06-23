@@ -1,0 +1,6 @@
+asgiref==3.8.1 # for Django              | BSD-3-Clause
+Django==5.2.3 # Django                   | BSD-3-Clause
+sqlparse==0.5.3 # for Django             | BSD License
+typing_extensions==4.14.0 # for Django   | PSF-2.0
+python-dotenv==1.1.0 # for .env settings | BSD-3-Clause
+psycopg2==2.9.10 # for database postgres | LGPL
