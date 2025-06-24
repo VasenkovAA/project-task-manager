@@ -1,0 +1,28 @@
+from django.db import models
+from simple_history.models import HistoricalRecords
+
+class Location(models.Model):
+    location_name = models.CharField(
+        max_length=255,
+        verbose_name="Location Name",
+        help_text="Enter the name of the location",
+        unique=True
+    )
+    location_description = models.TextField(
+        verbose_name="Location Description",
+        help_text="Detailed description of the location",
+        blank=True,
+        null=True
+    )
+    location_address = models.CharField(
+        max_length=512,
+        verbose_name="Location Address",
+        help_text="Physical address of the location",
+        blank=True,
+        null=True
+    )
+
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.location_name
