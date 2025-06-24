@@ -4,3 +4,6 @@ sqlparse==0.5.3
 typing_extensions==4.14.0
 python-dotenv==1.1.0
 psycopg2-binary==2.9.10
+django-simple-history==3.10.1
+django-taggit==6.1.0
+django-currentuser==0.9.0
