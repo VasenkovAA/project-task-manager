@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'task',
     'taggit',
+    'simple_history',
 ]
 
 MIDDLEWARE = [

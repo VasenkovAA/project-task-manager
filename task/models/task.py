@@ -358,7 +358,7 @@ def update_dependent_tasks(sender, instance, **kwargs):
 
         Task.objects.filter(id=task_id).update(
             progress_dependencies=task.progress_dependencies,
-            is_ready=task.is_ready
+            is_ready=task.is_ready,
         )
 
 @receiver(m2m_changed, sender=Task.dependencies.through)
@@ -372,5 +372,5 @@ def update_on_dependencies_change(sender, instance, action, **kwargs):
 
         Task.objects.filter(pk=instance.pk).update(
             progress_dependencies=instance.progress_dependencies,
-            is_ready=instance.is_ready
+            is_ready=instance.is_ready,
         )
