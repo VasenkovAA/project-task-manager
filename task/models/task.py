@@ -310,9 +310,9 @@ class Task(models.Model):
 
         self.__original_status = self.status
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):   # noqa: DJ012, RUF100
         super().__init__(*args, **kwargs)
-        self.__original_status = self.status  # noqa: DJ012, RUF100
+        self.__original_status = self.status
 
     def clean(self):
         """Validate related dates and cancellation conditions"""
