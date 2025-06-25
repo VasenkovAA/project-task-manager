@@ -1,6 +1,8 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 
+from task.models.space import Space
+
 
 class Link(models.Model):
     link_title = models.CharField(
@@ -11,8 +13,18 @@ class Link(models.Model):
         help_text='Description or notes about the link',
         blank=True,
     )
-    link_url = models.URLField(verbose_name='URL', help_text='URL address of the material', unique=True)
+    link_url = models.URLField(
+        verbose_name='URL',
+        help_text='URL address of the material',
+        unique=True,
+        )
 
+    link_space = models.ForeignKey(
+        Space,
+        on_delete=models.CASCADE,
+        help_text='sapce',
+        verbose_name='space',
+    )
     history = HistoricalRecords()
 
     def __str__(self):

@@ -1,6 +1,8 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 
+from task.models.space import Space
+
 
 class Location(models.Model):
     location_name = models.CharField(
@@ -16,6 +18,12 @@ class Location(models.Model):
         verbose_name='Location Address',
         help_text='Physical address of the location',
         blank=True,
+    )
+    location_space = models.ForeignKey(
+        Space,
+        on_delete=models.CASCADE,
+        help_text='sapce',
+        verbose_name='space',
     )
 
     history = HistoricalRecords()

@@ -1,6 +1,8 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 
+from task.models.space import Space
+
 
 class Category(models.Model):
     category_name = models.CharField(
@@ -17,6 +19,12 @@ class Category(models.Model):
         default=dict,
         blank=True,
         null=True,
+    )
+    category_space = models.ForeignKey(
+        Space,
+        on_delete=models.CASCADE,
+        help_text='sapce',
+        verbose_name='space',
     )
 
     history = HistoricalRecords()

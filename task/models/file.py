@@ -1,6 +1,8 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 
+from task.models.space import Space
+
 
 class File(models.Model):
     file_name = models.CharField(
@@ -15,6 +17,12 @@ class File(models.Model):
         upload_to='uploads/files/',
         verbose_name='File Upload',
         help_text='Upload the document file',
+    )
+    file_space = models.ForeignKey(
+        Space,
+        on_delete=models.CASCADE,
+        help_text='sapce',
+        verbose_name='space',
     )
 
     history = HistoricalRecords()

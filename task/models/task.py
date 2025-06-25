@@ -1,4 +1,3 @@
-from category import Category
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -7,12 +6,17 @@ from django.db.models import Avg, Case, IntegerField, When
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from django_currentuser.middleware import get_current_user
-from link import Link
-from location import Location
 from simple_history.models import HistoricalRecords
-from status import Status
 from taggit.managers import TaggableManager
-from validations import validate_notifications, validate_reminders, validate_time_intervals
+
+from task.models import (
+    Category,
+    Link,
+    Location,
+    Space,
+    Status,
+)
+from task.models.validations import validate_notifications, validate_reminders, validate_time_intervals
 
 
 class Task(models.Model):
@@ -272,6 +276,13 @@ class Task(models.Model):
         verbose_name='Links',
     )
 
+    task_space = models.ForeignKey(
+        Space,
+        on_delete=models.CASCADE,
+        help_text='sapce',
+        verbose_name='space',
+    )
+
     class Meta:
         indexes = [
             models.Index(fields=['is_ready']),
@@ -300,9 +311,8 @@ class Task(models.Model):
         self.__original_status = self.status
 
     def __init__(self, *args, **kwargs):
-        super.__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.__original_status = self.status
-
     def clean(self):
         """Validate related dates and cancellation conditions"""
         if self.start_date and self.end_date and self.start_date > self.end_date:
@@ -328,7 +338,7 @@ class Task(models.Model):
     @property
     def calculated_is_ready(self):
         """Dynamic calculation of task readiness"""
-        return self.calculated_progress_dependencies == 100
+        return self.calculated_progress_dependencies == 100  # noqa: PLR2004
 
 
 @receiver(post_save, sender=Task)
@@ -341,11 +351,11 @@ def update_dependent_tasks(sender, instance, **kwargs):
 
     dependent_tasks.update(
         progress_dependencies=Case(
-            When(dependencies=None, then=100), default=Avg('dependencies__progress'), output_field=IntegerField()
+            When(dependencies=None, then=100), default=Avg('dependencies__progress'), output_field=IntegerField(),
         ),
         is_ready=Case(
             When(dependencies=None, then=True),
-            default=Avg('dependencies__progress') == 100,
+            default=Avg('dependencies__progress') == 100,  # noqa: PLR2004
             output_field=models.BooleanField(),
         ),
     )
@@ -358,5 +368,5 @@ def update_on_dependencies_change(sender, instance, action, **kwargs):
     """
     if action in ['post_add', 'post_remove', 'post_clear']:
         Task.objects.filter(pk=instance.pk).update(
-            progress_dependencies=instance.calculated_progress_dependencies, is_ready=instance.calculated_is_ready
+            progress_dependencies=instance.calculated_progress_dependencies, is_ready=instance.calculated_is_ready,
         )

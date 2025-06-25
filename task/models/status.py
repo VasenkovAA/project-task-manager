@@ -1,6 +1,9 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
-from validations import validate_status_settings
+
+from task.models.space import Space
+
+from .validations import validate_status_settings
 
 
 class Status(models.Model):
@@ -22,6 +25,12 @@ class Status(models.Model):
         blank=True,
         null=True,
         validators=[validate_status_settings],
+    )
+    status_space = models.ForeignKey(
+        Space,
+        on_delete=models.CASCADE,
+        help_text='sapce',
+        verbose_name='space',
     )
 
     history = HistoricalRecords()
