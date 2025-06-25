@@ -1,25 +1,27 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
+from validations import validate_status_settings
 
 class Status(models.Model):
     status_name = models.CharField(
         max_length=100,
         verbose_name="Status Name",
         help_text="Enter the name of the task status",
-        unique=True
+        unique=True,
     )
     status_description = models.TextField(
         verbose_name="Status Description",
         help_text="Detailed description of the status",
         blank=True,
-        null=True
+        null=True,
     )
     status_settings = models.JSONField(
         verbose_name="Status Settings",
         help_text="JSON configuration for the status",
         default=dict,
         blank=True,
-        null=True
+        null=True,
+        validators=[validate_status_settings]
     )
 
     history = HistoricalRecords()

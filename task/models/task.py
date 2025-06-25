@@ -283,34 +283,42 @@ class Task(models.Model):
             models.Index(fields=['status']),
             models.Index(fields=['assignee']),
         ]
+    def __init__(self, *args, **kwargs):
+        super.__init__(*args, **kwargs)
+        self.__original_status = self.status
 
     def clean(self):
-        """Валидация связанных дат и условий отмены"""
-        # Проверка согласованности дат
+        """Validate related dates and cancellation conditions"""
         if self.start_date and self.end_date and self.start_date > self.end_date:
             raise ValidationError("Start date must be before end date")
         
         if self.end_date and self.deadline and self.end_date > self.deadline:
             raise ValidationError("End date must be before deadline")
         
-        # Проверка причины отмены только при определенных статусах
         if self.status and self.status.name.lower() == "canceled" and not self.cancel_reason:
             raise ValidationError("Cancel reason is required for canceled status")
 
     def save(self, *args, **kwargs):
-        """Автоматическое обновление last_editor и версии"""
-        # Обновление last_editor для существующих записей
+        """Automatic update of last_editor, version, and status-based progress"""
         if not self._state.adding:
             current_user = get_current_user()
             if current_user and current_user.is_authenticated:
-                self.last_editor = current_user
+                if not self.last_editor_id and hasattr(self, 'request'):
+                    self.last_editor = self.request.user
         
-        # Автоматическая валидация перед сохранением
+        if self.status_id and self.status != self.__original_status:
+            settings = getattr(self.status, 'status_settings', {})
+            if 'progress_on_set' in settings and settings['progress_on_set'] is not None:
+                self.progress = settings['progress_on_set']
+        
         self.full_clean()
         super().save(*args, **kwargs)
 
+        self.__original_status = self.status
+
     @property
     def calculated_progress_dependencies(self):
+        """Calculate dependencies progress""" 
         deps = self.dependencies.filter(is_deleted=False)
         if not deps.exists(): 
             return 100
@@ -321,20 +329,17 @@ class Task(models.Model):
 
     @property
     def calculated_is_ready(self):
-        """Динамический расчет готовности задачи"""
+        """Dynamic calculation of task readiness"""
         return self.calculated_progress_dependencies == 100
 
-# Сигналы для автоматического обновления зависимостей
 @receiver(post_save, sender=Task)
 def update_dependent_tasks(sender, instance, **kwargs):
     """
-    Обновление задач, зависящих от текущей задачи
-    при изменении ее прогресса
+    Updating tasks dependent on the current task
+    when its progress changes
     """
-    # Находим все задачи, которые зависят от этой
     dependent_tasks = Task.objects.filter(dependencies=instance)
     
-    # Массовое обновление без рекурсии
     dependent_tasks.update(
         progress_dependencies=Case(
             When(dependencies=None, then=100),
@@ -351,10 +356,9 @@ def update_dependent_tasks(sender, instance, **kwargs):
 @receiver(m2m_changed, sender=Task.dependencies.through)
 def update_on_dependencies_change(sender, instance, action, **kwargs):
     """
-    Обновление задачи при изменении ее зависимостей
+    Update task when its dependencies change
     """
     if action in ["post_add", "post_remove", "post_clear"]:
-        # Прямое обновление без вызова save()
         Task.objects.filter(pk=instance.pk).update(
             progress_dependencies=instance.calculated_progress_dependencies,
             is_ready=instance.calculated_is_ready
