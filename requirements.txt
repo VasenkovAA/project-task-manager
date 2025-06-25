@@ -8,3 +8,6 @@ django-simple-history==3.10.1 # for history    | BSD License
 django-taggit==6.1.0 # for tag in task         | BSD License (BSD)
 django-currentuser==0.9.0 # for time in task   | BSD License
 djangorestframework==3.16.0 # for REST API     | BSD License (BSD)
+django-filter==25.1 # for filter in API        | BSD License 
+drf-spectacular==0.28.0 # for Swagger API      | BSD License (BSD)
+djangorestframework_simplejwt==5.5.0 #for JWT  | MIT License (MIT) 
