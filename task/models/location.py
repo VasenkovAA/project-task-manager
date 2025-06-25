@@ -6,7 +6,7 @@ from task.models.space import Space
 
 class Location(models.Model):
     location_name = models.CharField(
-        max_length=255, verbose_name='Location Name', help_text='Enter the name of the location', unique=True
+        max_length=255, verbose_name='Location Name', help_text='Enter the name of the location', unique=True,
     )
     location_description = models.TextField(
         verbose_name='Location Description',

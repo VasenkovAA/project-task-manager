@@ -6,7 +6,7 @@ from task.models.space import Space
 
 class File(models.Model):
     file_name = models.CharField(
-        max_length=255, verbose_name='File Name', help_text='Enter the name of the file', unique=True
+        max_length=255, verbose_name='File Name', help_text='Enter the name of the file', unique=True,
     )
     file_description = models.TextField(
         verbose_name='File Description',

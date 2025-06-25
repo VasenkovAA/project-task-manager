@@ -6,7 +6,7 @@ from task.models.space import Space
 
 class Link(models.Model):
     link_title = models.CharField(
-        max_length=255, verbose_name='Link Title', help_text='Enter the title or name of the link', unique=True
+        max_length=255, verbose_name='Link Title', help_text='Enter the title or name of the link', unique=True,
     )
     link_description = models.TextField(
         verbose_name='Link Description',

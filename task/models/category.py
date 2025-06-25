@@ -6,7 +6,7 @@ from task.models.space import Space
 
 class Category(models.Model):
     category_name = models.CharField(
-        max_length=255, verbose_name='Category Name', help_text='Enter the name of the category', unique=True
+        max_length=255, verbose_name='Category Name', help_text='Enter the name of the category', unique=True,
     )
     category_description = models.TextField(
         verbose_name='Category Description',

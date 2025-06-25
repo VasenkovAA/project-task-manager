@@ -5,7 +5,7 @@ from simple_history.models import HistoricalRecords
 
 class Space(models.Model):
     space_name = models.CharField(
-        max_length=255, verbose_name='Space Name', help_text='Enter the name of the space', unique=True
+        max_length=255, verbose_name='Space Name', help_text='Enter the name of the space', unique=True,
     )
     space_settings = models.JSONField(
         verbose_name='Space Settings',
