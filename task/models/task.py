@@ -312,7 +312,8 @@ class Task(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__original_status = self.status
+        self.__original_status = self.status  # noqa: DJ012, RUF100
+
     def clean(self):
         """Validate related dates and cancellation conditions"""
         if self.start_date and self.end_date and self.start_date > self.end_date:
