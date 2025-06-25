@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'task',
     'taggit',
     'rest_framework',
+    'simple_history',
 ]
 
 MIDDLEWARE = [
