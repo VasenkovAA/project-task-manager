@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -26,6 +27,8 @@ INSTALLED_APPS = [
     'taggit',
     'rest_framework',
     'simple_history',
+    'drf_spectacular',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -96,3 +99,46 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ),
+}
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Task Management API',
+    'DESCRIPTION': 'API для управления задачами',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': r'/api/',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY': [
+        {
+            'Bearer': {
+                'type': 'apiKey',
+                'name': 'Authorization',
+                'in': 'header',
+            },
+        },
+    ],
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+        'filter': True,
+    },
+}
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}

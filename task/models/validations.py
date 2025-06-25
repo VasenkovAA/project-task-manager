@@ -1,16 +1,16 @@
 
 
 def validate_time_intervals(value):
-    pass
+    return True
 
 
 def validate_reminders(value):
-    pass
+    return True
 
 
 def validate_notifications(value):
-    pass
+    return True
 
 
 def validate_status_settings(value):
-    pass
+    return True

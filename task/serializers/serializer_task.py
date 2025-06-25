@@ -1,41 +1,23 @@
 from rest_framework import serializers
+
 from task.models import (
     Category,
     Link,
     Location,
     Status,
     Task,
-    validate_notifications,
-    validate_reminders,
-    validate_status_settings,
-    validate_time_intervals,
 )
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    """Serializer for Task model with extended functionality."""
-
-    status = serializers.PrimaryKeyRelatedField(queryset=Status.objects.all(), allow_null=True)
-
-    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all(), allow_null=True)
-
+    status = serializers.PrimaryKeyRelatedField(queryset=Status.objects.all(), allow_null=True, required=False)
+    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all(), allow_null=True, required=False)
     assignee = serializers.PrimaryKeyRelatedField(
-        queryset=Task._meta.get_field('assignee').remote_field.model.objects.all(), allow_null=True,
+        queryset=Task._meta.get_field('assignee').remote_field.model.objects.all(), allow_null=True, required=False
     )
-
-    dependencies = serializers.PrimaryKeyRelatedField(many=True, queryset=Task.objects.all())
-
-    categories = serializers.PrimaryKeyRelatedField(many=True, queryset=Category.objects.all())
-
-    links = serializers.PrimaryKeyRelatedField(many=True, queryset=Link.objects.all())
-
-    calculated_progress_dependencies = serializers.IntegerField(read_only=True)
-    calculated_is_ready = serializers.BooleanField(read_only=True)
-
-    time_intervals = serializers.JSONField(validators=[validate_time_intervals], required=False)
-    reminders = serializers.JSONField(validators=[validate_reminders], required=False)
-    notifications = serializers.JSONField(validators=[validate_notifications], required=False)
-    status_settings = serializers.JSONField(validators=[validate_status_settings], required=False)
+    dependencies = serializers.PrimaryKeyRelatedField(many=True, queryset=Task.objects.all(), required=False)
+    categories = serializers.PrimaryKeyRelatedField(many=True, queryset=Category.objects.all(), required=False)
+    links = serializers.PrimaryKeyRelatedField(many=True, queryset=Link.objects.all(), required=False)
 
     tags = serializers.SerializerMethodField()
 
@@ -57,7 +39,6 @@ class TaskSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date',
             'deadline',
-            'deleted_at',
             'dependencies',
             'categories',
             'location',
@@ -70,32 +51,23 @@ class TaskSerializer(serializers.ModelSerializer):
             'is_recurring',
             'needs_approval',
             'is_template',
-            'is_deleted',
             'estimated_duration',
             'actual_duration',
             'quality_rating',
             'budget',
             'cancel_reason',
-            'time_intervals',
-            'reminders',
             'repeat_interval',
             'next_activation',
             'tags',
-            'notifications',
             'links',
             'task_space',
-            'calculated_progress_dependencies',
-            'calculated_is_ready',
         ]
         read_only_fields = [
             'id',
             'created_at',
             'updated_at',
-            'deleted_at',
             'author',
             'last_editor',
-            'calculated_progress_dependencies',
-            'calculated_is_ready',
         ]
 
     def create(self, validated_data):
@@ -136,3 +108,9 @@ class TaskSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+    def to_internal_value(self, data):
+        unknown_fields = set(data.keys()) - set(self.fields.keys())
+        for field in unknown_fields:
+            data.pop(field, None)
+        return super().to_internal_value(data)
