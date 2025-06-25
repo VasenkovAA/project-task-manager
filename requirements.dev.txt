@@ -7,3 +7,4 @@ psycopg2-binary==2.9.10
 django-simple-history==3.10.1
 django-taggit==6.1.0
 django-currentuser==0.9.0
+djangorestframework==3.16.0

@@ -1,14 +1,10 @@
 from rest_framework import serializers
-
 from task.models import (
     Category,
-    File,
     Link,
     Location,
-    Space,
     Status,
     Task,
-    TaskLink,
     validate_notifications,
     validate_reminders,
     validate_status_settings,
@@ -16,107 +12,8 @@ from task.models import (
 )
 
 
-class SpaceSerializer(serializers.ModelSerializer):
-    """Serializer for Space model.
-
-    Handles serialization/deserialization of Space objects.
-    Includes all fields except those marked as read-only.
-    """
-
-    class Meta:
-        model = Space
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at']
-
-
-class StatusSerializer(serializers.ModelSerializer):
-    """Serializer for Status model.
-
-    Handles serialization/deserialization of Status objects.
-    Includes all fields with 'id' marked as read-only.
-    """
-
-    class Meta:
-        model = Status
-        fields = '__all__'
-        read_only_fields = ['id']
-
-
-class LocationSerializer(serializers.ModelSerializer):
-    """Serializer for Location model.
-
-    Handles serialization/deserialization of Location objects.
-    Includes all fields with 'id' marked as read-only.
-    """
-
-    class Meta:
-        model = Location
-        fields = '__all__'
-        read_only_fields = ['id']
-
-
-class LinkSerializer(serializers.ModelSerializer):
-    """Serializer for Link model.
-
-    Handles serialization/deserialization of Link objects.
-    Includes all fields with 'id' marked as read-only.
-    """
-
-    class Meta:
-        model = Link
-        fields = '__all__'
-        read_only_fields = ['id']
-
-
-class FileSerializer(serializers.ModelSerializer):
-    """Serializer for File model.
-
-    Handles serialization/deserialization of File objects.
-    Includes all fields with 'id' marked as read-only.
-    """
-
-    class Meta:
-        model = File
-        fields = '__all__'
-        read_only_fields = ['id']
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    """Serializer for Category model.
-
-    Handles serialization/deserialization of Category objects.
-    Includes all fields with 'id' marked as read-only.
-    """
-
-    class Meta:
-        model = Category
-        fields = '__all__'
-        read_only_fields = ['id']
-
-
-class TaskLinkSerializer(serializers.ModelSerializer):
-    """Serializer for TaskLink model.
-
-    Handles serialization/deserialization of TaskLink objects.
-    Includes all fields with 'id' marked as read-only.
-    """
-
-    class Meta:
-        model = TaskLink
-        fields = '__all__'
-        read_only_fields = ['id']
-
-
 class TaskSerializer(serializers.ModelSerializer):
-    """Serializer for Task model with extended functionality.
-
-    Handles complex serialization/deserialization of Task objects including:
-    - ForeignKey relations (status, location, assignee)
-    - Many-to-Many relations (dependencies, categories, links)
-    - Calculated fields (progress, readiness)
-    - JSON field validation (time_intervals, reminders, etc.)
-    - Tag management
-    """
+    """Serializer for Task model with extended functionality."""
 
     status = serializers.PrimaryKeyRelatedField(queryset=Status.objects.all(), allow_null=True)
 
@@ -202,14 +99,7 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        """Create a new Task instance with nested relationships.
-
-        Processes:
-        - Extracts relationship data (dependencies, categories, links)
-        - Sets author from request context
-        - Creates task instance
-        - Sets many-to-many relationships
-        """
+        """Create a new Task instance with nested relationships."""
         dependencies = validated_data.pop('dependencies', [])
         categories = validated_data.pop('categories', [])
         links = validated_data.pop('links', [])
@@ -226,14 +116,7 @@ class TaskSerializer(serializers.ModelSerializer):
         return task
 
     def update(self, instance, validated_data):
-        """Update an existing Task instance with nested relationships.
-
-        Processes:
-        - Extracts relationship data (dependencies, categories, links)
-        - Updates last_editor from request context
-        - Updates instance attributes
-        - Updates many-to-many relationships if provided
-        """
+        """Update an existing Task instance with nested relationships."""
         dependencies = validated_data.pop('dependencies', None)
         categories = validated_data.pop('categories', None)
         links = validated_data.pop('links', None)
