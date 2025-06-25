@@ -322,7 +322,7 @@ class Task(models.Model):
         if self.end_date and self.deadline and self.end_date > self.deadline:
             raise ValidationError('End date must be before deadline')
 
-        if self.status and self.status.name.lower() == 'canceled' and not self.cancel_reason:
+        if self.status and self.status.status_name.lower() == 'canceled' and not self.cancel_reason:
             raise ValidationError('Cancel reason is required for canceled status')
 
     @property
@@ -348,19 +348,18 @@ def update_dependent_tasks(sender, instance, **kwargs):
     Updating tasks dependent on the current task
     when its progress changes
     """
-    dependent_tasks = Task.objects.filter(dependencies=instance)
+    dependent_task_ids = Task.objects.filter(dependencies=instance).values_list('id', flat=True)
 
-    dependent_tasks.update(
-        progress_dependencies=Case(
-            When(dependencies=None, then=100), default=Avg('dependencies__progress'), output_field=IntegerField(),
-        ),
-        is_ready=Case(
-            When(dependencies=None, then=True),
-            default=Avg('dependencies__progress') == 100,  # noqa: PLR2004
-            output_field=models.BooleanField(),
-        ),
-    )
+    for task_id in dependent_task_ids:
+        task = Task.objects.get(id=task_id)
 
+        task.progress_dependencies = task.calculated_progress_dependencies
+        task.is_ready = task.calculated_is_ready
+
+        Task.objects.filter(id=task_id).update(
+            progress_dependencies=task.progress_dependencies,
+            is_ready=task.is_ready
+        )
 
 @receiver(m2m_changed, sender=Task.dependencies.through)
 def update_on_dependencies_change(sender, instance, action, **kwargs):
@@ -368,6 +367,10 @@ def update_on_dependencies_change(sender, instance, action, **kwargs):
     Update task when its dependencies change
     """
     if action in ['post_add', 'post_remove', 'post_clear']:
+        instance.progress_dependencies = instance.calculated_progress_dependencies
+        instance.is_ready = instance.calculated_is_ready
+
         Task.objects.filter(pk=instance.pk).update(
-            progress_dependencies=instance.calculated_progress_dependencies, is_ready=instance.calculated_is_ready,
+            progress_dependencies=instance.progress_dependencies,
+            is_ready=instance.is_ready
         )
