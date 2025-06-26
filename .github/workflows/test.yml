@@ -97,6 +97,7 @@ jobs:
       env:
         DATABASE_URL: "sqlite:///:memory:"
         DJANGO_SETTINGS_MODULE: "task_manager.settings"
+        SECRET_KEY: "dummy-secret-key-for-ci-12345"
         DEBUG: "0"
         REDIS_URL: "redis://dummy@localhost:6379/0"
         EMAIL_HOST: "localhost"
