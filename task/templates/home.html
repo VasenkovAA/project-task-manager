@@ -1,0 +1,669 @@
+{% extends 'base.html' %}
+
+{% block extrastyles %}
+<style>
+    /* Стили специфичные для главной страницы */
+    .hero {
+        padding: 160px 0 100px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .hero-text {
+        flex: 1;
+        padding-right: 50px;
+    }
+
+    .hero-text h1 {
+        font-size: 48px;
+        margin-bottom: 20px;
+        color: var(--dark);
+    }
+
+    .hero-text h1 span {
+        color: var(--primary);
+    }
+
+    .hero-text p {
+        font-size: 18px;
+        margin-bottom: 30px;
+        color: var(--gray);
+        max-width: 600px;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .hero-image {
+        flex: 1;
+        position: relative;
+        text-align: center;
+    }
+
+    .hero-image img {
+        max-width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        transform: perspective(1000px) rotateY(-10deg);
+        transition: var(--transition);
+    }
+
+    .hero-image img:hover {
+        transform: perspective(1000px) rotateY(0);
+    }
+
+    .features {
+        padding: 100px 0;
+        background: white;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 70px;
+    }
+
+    .section-title h2 {
+        font-size: 36px;
+        color: var(--dark);
+        margin-bottom: 15px;
+    }
+
+    .section-title p {
+        font-size: 18px;
+        color: var(--gray);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        text-align: center;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(67, 97, 238, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        color: var(--primary);
+        font-size: 32px;
+    }
+
+    .feature-card h3 {
+        font-size: 22px;
+        margin-bottom: 15px;
+        color: var(--dark);
+    }
+
+    .feature-card p {
+        color: var(--gray);
+    }
+
+    .benefits {
+        padding: 100px 0;
+        background: linear-gradient(135deg, #f0f4f8 0%, #e2ebf5 100%);
+    }
+
+    .benefits-container {
+        display: flex;
+        align-items: center;
+        gap: 50px;
+    }
+
+    .benefits-image {
+        flex: 1;
+    }
+
+    .benefits-image img {
+        max-width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .benefits-content {
+        flex: 1;
+    }
+
+    .benefits-content h2 {
+        font-size: 36px;
+        margin-bottom: 30px;
+        color: var(--dark);
+    }
+
+    .benefit-item {
+        display: flex;
+        margin-bottom: 30px;
+    }
+
+    .benefit-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(67, 97, 238, 0.1);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        color: var(--primary);
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .benefit-text h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        color: var(--dark);
+    }
+
+    .benefit-text p {
+        color: var(--gray);
+    }
+
+    .testimonials {
+        padding: 100px 0;
+        background: white;
+    }
+
+    .testimonial-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+
+    .testimonial-card {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: var(--box-shadow);
+        position: relative;
+    }
+
+    .testimonial-card:before {
+        content: """;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 80px;
+        color: rgba(67, 97, 238, 0.1);
+        font-family: Georgia, serif;
+        line-height: 1;
+    }
+
+    .testimonial-content {
+        margin-top: 20px;
+        margin-bottom: 30px;
+        color: var(--gray);
+        font-style: italic;
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+    }
+
+    .author-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--light-gray);
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-weight: bold;
+    }
+
+    .author-info h4 {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .author-info p {
+        color: var(--gray);
+        font-size: 14px;
+    }
+
+    .cta {
+        padding: 100px 0;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        text-align: center;
+    }
+
+    .cta h2 {
+        font-size: 42px;
+        margin-bottom: 20px;
+    }
+
+    .cta p {
+        font-size: 20px;
+        max-width: 700px;
+        margin: 0 auto 40px;
+        opacity: 0.9;
+    }
+
+    .cta-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .btn-light {
+        background: white;
+        color: var(--primary);
+    }
+
+    .btn-light:hover {
+        background: var(--light-gray);
+        transform: translateY(-3px);
+        box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    footer {
+        background: var(--dark);
+        color: white;
+        padding: 70px 0 30px;
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        margin-bottom: 50px;
+    }
+
+    .footer-col h3 {
+        font-size: 20px;
+        margin-bottom: 25px;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .footer-col h3:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 2px;
+        background: var(--primary);
+    }
+
+    .footer-links {
+        list-style: none;
+    }
+
+    .footer-links li {
+        margin-bottom: 12px;
+    }
+
+    .footer-links a {
+        color: #adb5bd;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+        color: white;
+        padding-left: 5px;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .social-links a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        transition: var(--transition);
+    }
+
+    .social-links a:hover {
+        background: var(--primary);
+        transform: translateY(-3px);
+    }
+
+    .copyright {
+        text-align: center;
+        padding-top: 30px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: #adb5bd;
+        font-size: 14px;
+    }
+
+    @media (max-width: 992px) {
+        .hero-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .hero-text {
+            padding-right: 0;
+            margin-bottom: 50px;
+        }
+        
+        .hero-buttons {
+            justify-content: center;
+        }
+        
+        .benefits-container {
+            flex-direction: column;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-text h1 {
+            font-size: 36px;
+        }
+        
+        .section-title h2 {
+            font-size: 30px;
+        }
+        
+        .cta h2 {
+            font-size: 32px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Управляйте задачами и проектами <span>с легкостью</span></h1>
+                    <p>Task Manager - это ваш надежный партнер в организации работы команды. Простое управление задачами, прозрачность процессов и высокая продуктивность - все это теперь доступно в одном месте.</p>
+                    <div class="hero-buttons">
+                     
+                        <a href="#features" class="btn btn-secondary btn-large">Узнать больше</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Task Manager Dashboard">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Мощные возможности для вашей команды</h2>
+                <p>Task Manager предоставляет все необходимые инструменты для эффективного управления проектами и задачами</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3>Управление задачами</h3>
+                    <p>Создавайте задачи, назначайте ответственных, устанавливайте сроки и приоритеты. Все в одном месте.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3>Управление проектами</h3>
+                    <p>Разбивайте проекты на этапы и задачи. Контролируйте прогресс и сроки выполнения.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Командное общение</h3>
+                    <p>Общайтесь в контексте задач, делитесь файлами, будьте всегда на связи с командой.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Аналитика и отчеты</h3>
+                    <p>Отслеживайте производительность команды и проектов с помощью наглядных отчетов.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>Календарь и планирование</h3>
+                    <p>Планируйте сроки, встречи и контрольные точки. Ничто не останется незамеченным.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Мобильные приложения</h3>
+                    <p>Управляйте задачами в любое время и в любом месте с помощью наших мобильных приложений.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits" id="benefits">
+        <div class="container">
+            <div class="benefits-container">
+                <div class="benefits-image">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1415&q=80" alt="Task Manager Benefits">
+                </div>
+                <div class="benefits-content">
+                    <h2>Почему выбирают Task Manager?</h2>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Повышение продуктивности</h3>
+                            <p>Сократите время на рутинные задачи и сосредоточьтесь на важном. Наши инструменты помогут вашей команде работать эффективнее.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Полная прозрачность</h3>
+                            <p>Отслеживайте прогресс каждого проекта в реальном времени. Все участники команды видят общую картину.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Улучшение коммуникации</h3>
+                            <p>Встроенные инструменты общения сокращают количество совещаний и переписок в мессенджерах.</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Безопасность данных</h3>
+                            <p>Ваши данные защищены с помощью современных технологий шифрования и регулярного резервного копирования.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-title">
+                <h2>Что говорят наши клиенты</h2>
+                <p>Узнайте, как Task Manager помогает командам достигать большего</p>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        "Task Manager полностью изменил нашу работу. Теперь мы успеваем на 30% больше проектов в те же сроки. Интуитивный интерфейс и мощные функции - идеальное сочетание!"
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">АИ</div>
+                        <div class="author-info">
+                            <h4>Анна Иванова</h4>
+                            <p>Руководитель проектов, TechCompany</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        "Мы перепробовали множество систем, но Task Manager стал настоящим открытием. Особенно ценю гибкость настройки и возможность адаптировать систему под наши бизнес-процессы."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">МП</div>
+                        <div class="author-info">
+                            <h4>Михаил Петров</h4>
+                            <p>CTO, Digital Agency</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        "Благодаря Task Manager наша команда стала работать слаженнее. Теперь все знают свои задачи и сроки, а руководители видят общую картину. Это сэкономило нам десятки часов в месяц!"
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">ЕС</div>
+                        <div class="author-info">
+                            <h4>Екатерина Сидорова</h4>
+                            <p>Менеджер по продукту, FinTech Startup</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Готовы повысить продуктивность вашей команды?</h2>
+            <p>Присоединяйтесь к тысячам компаний, которые уже используют Task Manager для управления проектами</p>
+            <div class="cta-buttons">
+               
+                <a href="#" class="btn btn-secondary btn-large">Запланировать демо</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>TaskManager</h3>
+                    <p>Современная платформа для управления проектами и задачами, помогающая командам работать эффективнее.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h3>Продукт</h3>
+                    <ul class="footer-links">
+                        <li><a href="#features">Возможности</a></li>
+                        <li><a href="#pricing">Тарифы</a></li>
+                        <li><a href="#">Интеграции</a></li>
+                        <li><a href="#">Обновления</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Ресурсы</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Блог</a></li>
+                        <li><a href="#">Документация</a></li>
+                        <li><a href="#">Веб-семинары</a></li>
+                        <li><a href="#">Сообщество</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Компания</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">О нас</a></li>
+                        <li><a href="#">Контакты</a></li>
+                        <li><a href="#">Карьера</a></li>
+                        <li><a href="#">Партнерская программа</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; {{ year }} TaskManager. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+{% endblock %}
+
+{% block extrascripts %}
+<script>
+    // Smooth scrolling для главной страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Закрыть мобильное меню если открыто
+                    if (window.innerWidth <= 768) {
+                        document.querySelector('.nav-links').classList.remove('active');
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

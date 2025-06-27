@@ -1,0 +1,24 @@
+<nav class="navbar">
+  <div class="container">
+    <a href="{% url 'home' %}" class="logo">
+      <i class="fas fa-tasks"></i>
+      TaskManager
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Возможности</a></li>
+      <li><a href="#benefits">Преимущества</a></li>
+      <li><a href="#testimonials">Отзывы</a></li>
+      <li><a href="#pricing">Тарифы</a></li>
+    </ul>
+    <div class="auth-buttons">
+      {% if user.is_authenticated %}
+
+      {% else %}
+
+      {% endif %}
+    </div>
+    <button class="mobile-menu-btn">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+</nav>
