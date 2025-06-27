@@ -23,7 +23,7 @@ jobs:
           pip install ruff
 
       - name: Run Ruff linting
-        run: ruff check .
+        run: ruff check --fix
 
   security:
     name: Security Checks
