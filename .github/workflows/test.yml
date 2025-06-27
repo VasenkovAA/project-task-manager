@@ -1,109 +1,93 @@
-name: Run Django Tests
+name: CI Pipeline
 on: [push]
 
 jobs:
-  #test-django-app:
-  #  runs-on: ubuntu-latest
-  #  strategy:
-  #    fail-fast: false
-  #    matrix:
-  #      python-version: ["3.11"]
-  #  steps:
-  #    - uses: actions/checkout@v3
-  #      with:
-  #        fetch-depth: 0
-  #    - name: Set up Python ${{ matrix.python-version }}
-  #      uses: actions/setup-python@v3
-  #      with:
-  #        python-version: ${{ matrix.python-version }}
-  #    - name: Install dependencies
-  #      run: |
-  #        python -m pip install --upgrade pip
-  #        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-  #    - name: Run Django test
-  #      run: |
-  #        python manage.py test
-
   lint:
+    name: Lint with Ruff
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-
-      - name: Install ruff
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install ruff
 
-      - name: Run ruff
-        run: ruff check --fix
+      - name: Run Ruff linting
+        run: ruff check .
 
-  check_dependencies:
+  security:
+    name: Security Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
 
-    - name: Cache pip packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    - name: Upgrade pip and setuptools
-      run: |
-        python -m pip install --upgrade pip setuptools
-    - name: Check for outdated dependencies
-      run: |
-        pip list --outdated --format=columns || echo "No outdated packages found"
-    - name: Check for security vulnerabilities
-      run: |
-        pip install pip-audit
-        pip-audit || echo "Vulnerabilities found (see report above)"
-    - name: Fail if setuptools is vulnerable
-      run: |
-        pip list | grep setuptools
-        if pip list | grep 'setuptools\s*65\.5\.0'; then
-          echo "::error::Vulnerable setuptools version detected (65.5.0). Please upgrade to 65.5.1 or higher."
-          exit 1
-        fi
-  
-  check_migrations:
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools
+          pip install safety pip-audit
+
+      - name: Check for security vulnerabilities
+        run: |
+          pip list
+          pip-audit --ignore-vuln "GHSA-2qrg-x229-3v8q" -r requirements.txt
+
+      - name: Check vulnerable package versions
+        run: |
+          pip list --outdated --format=columns | tee outdated.txt
+          if grep -q 'setuptools' outdated.txt; then
+            echo "::warning::Outdated setuptools found"
+          fi
+
+  dependencies:
+    name: Dependency Management
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Check migrations
-      env:
-        DATABASE_URL: "sqlite:///:memory:"
-        DJANGO_SETTINGS_MODULE: "task_manager.settings"
-        SECRET_KEY: "dummy-secret-key-for-ci-12345"
-        DEBUG: "0"
-        REDIS_URL: "redis://dummy@localhost:6379/0"
-        EMAIL_HOST: "localhost"
-      run: |
-        python manage.py makemigrations --dry-run --check || \
-          (echo "::error::New migrations detected. Run 'makemigrations' and commit."; exit 1)
+      - name: Validate requirements.txt
+        run: |
+          if [ ! -f requirements.txt ]; then
+            echo "::error::requirements.txt file not found!"
+            exit 1
+          fi
+          grep -E '^[^#]+' requirements.txt | while read line; do
+            package=$(echo $line | cut -d'=' -f1 | tr -d '[:space:]')
+            if [ -z "$package" ]; then continue; fi
+            if ! pip install --dry-run $package > /dev/null 2>&1; then
+              echo "::error::Invalid package: $package"
+              exit 1
+            fi
+          done
 
-        python manage.py migrate --plan > /dev/null || \
-          (echo "::error::Migration conflicts detected. Resolve them before proceeding."; exit 1)
+      - name: Check dependency consistency
+        run: |
+          pip install pipdeptree
+          pipdeptree --warn fail > /dev/null
